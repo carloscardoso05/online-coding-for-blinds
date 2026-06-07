@@ -358,6 +358,7 @@
     #op,
     #cond,
     #laco,
+    #funcao,
     #runBtn {
       padding: 10px 20px;
       border: none;
@@ -388,6 +389,10 @@
       background: #b05c00;
     }
 
+    #funcao {
+      background: #006b6b;
+    }
+
     #runBtn {
       background: #333;
     }
@@ -397,6 +402,7 @@
     #op:hover,
     #cond:hover,
     #laco:hover,
+    #funcao:hover,
     #runBtn:hover {
       transform: scale(1.05);
     }
@@ -456,6 +462,7 @@
     <button id="op" aria-label="Acesse aqui para realizar operações matemáticas ou lógicas e atribuí-las a uma variável" onclick="operacao()">Operação</button>
     <button id="cond" aria-label="Acesse aqui para criar estruturas condicionais SE-ENTÃO" onclick="condicional()">Condicional</button>
     <button id="laco" aria-label="Acesse aqui para criar laços de repetição enquanto, para ou fazer-enquanto" onclick="laco()">Laço</button>
+    <button id="funcao" aria-label="Acesse aqui para criar uma função com nome, parâmetros e retorno" onclick="criarFuncao()">Função</button>
     <button id="print" aria-label="Acesse aqui para imprimir valores de variáveis ou textos na tela" onclick="escrever()">Imprimir valor na tela</button>
     <button id="runBtn" aria-label="Acesse aqui para executar o seu código">Executar</button>
     <button class="recordButton" id="startButton" aria-label="Acesse aqui para falar um comando personalizado para criação de código">🎤</button>
