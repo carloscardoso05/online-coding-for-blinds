@@ -820,6 +820,61 @@ async function laco() {
   }
 }
 
+// =====================================================
+// FUNÇÃO - criação de função nomeada com parâmetros e retorno
+// =====================================================
+async function criarFuncao() {
+  const nome = await ouvirComTentativas(
+    "Bem-vindo ao assistente para criação de funções. " +
+    "Qual o nome da função que você deseja criar?"
+  );
+  if (!nome) { feedbackAudio("Nome não informado. Ação cancelada."); return null; }
+
+  // Coleta de parâmetros
+  const parametros = [];
+  const temParamsRaw = await ouvirComTentativas(
+    "A função terá parâmetros? Parâmetros são valores recebidos pela função. Diga sim ou não."
+  );
+  if (!temParamsRaw) { feedbackAudio("Nenhuma resposta. Ação cancelada."); return null; }
+
+  const temParams = corrigir(temParamsRaw);
+  if (temParams.includes("sim") || temParams.includes("ok")) {
+    const qtdRaw = await ouvirComTentativas(
+      "Quantos parâmetros a função terá? Diga um número."
+    );
+    if (!qtdRaw) { feedbackAudio("Quantidade não informada. Ação cancelada."); return null; }
+    const qtd = await textoParaNumero(qtdRaw) ?? 1;
+
+    for (let i = 0; i < qtd; i++) {
+      const param = await ouvirComTentativas(
+        `Diga o nome do ${i + 1}º parâmetro.`
+      );
+      if (param) parametros.push(param);
+    }
+  }
+
+  // Coleta das ações do corpo
+  const acoes = await coletarAcoes("função " + nome);
+
+  // Verificação de retorno
+  let retorna = null;
+  const temRetornoRaw = await ouvirComTentativas(
+    "A função retorna algum valor? Diga sim ou não."
+  );
+  if (temRetornoRaw) {
+    const temRetorno = corrigir(temRetornoRaw);
+    if (temRetorno.includes("sim") || temRetorno.includes("ok")) {
+      const valorRetorno = await ouvirComTentativas(
+        "Qual valor ou variável a função deve retornar?"
+      );
+      if (valorRetorno) retorna = valorRetorno;
+    }
+  }
+
+  feedbackAudio("O código foi criado com sucesso.");
+  return enviarParaServidor({ acao: "funcao", nome, parametros, acoes, retorna });
+}
+
 // Exemplo no seu JavaScript
 async function enviarParaServidor(json_data) {
   if (!json_data) {
