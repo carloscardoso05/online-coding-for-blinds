@@ -743,6 +743,83 @@ async function condicional() {
   return enviarParaServidor(json);
 }
 
+// =====================================================
+// LAÇO (Loop) - enquanto / para / fazer-enquanto
+// =====================================================
+async function laco() {
+  const tipoRaw = await ouvirComTentativas(
+    "Bem-vindo ao assistente para criação de laços de repetição. " +
+    "Qual tipo de laço você deseja criar? Diga SOMENTE UMA das seguintes opções: " +
+    "ENQUANTO, PARA ou FAZER ENQUANTO."
+  );
+  if (!tipoRaw) {
+    feedbackAudio("Nenhuma resposta detectada. Ação cancelada.");
+    return null;
+  }
+  const tipo = tipoRaw.toLowerCase();
+
+  // --- ENQUANTO ---
+  if (tipo.includes("enquanto") && !tipo.includes("fazer")) {
+    const condicao = await ouvirComTentativas(
+      "Qual a condição de continuação do laço enquanto? Por exemplo: contador maior que zero."
+    );
+    if (!condicao) { feedbackAudio("Condição não informada. Ação cancelada."); return null; }
+
+    const acoes = await coletarAcoes("enquanto");
+
+    feedbackAudio("O código foi criado com sucesso.");
+    return enviarParaServidor({ acao: "laco", tipo: "enquanto", condicao, acoes });
+
+  // --- PARA ---
+  } else if (tipo.includes("para")) {
+    const variavel = await ouvirComTentativas(
+      "Qual o nome da variável de controle do laço? Por exemplo: i, contador ou indice."
+    );
+    if (!variavel) { feedbackAudio("Variável não informada. Ação cancelada."); return null; }
+
+    const inicioRaw = await ouvirComTentativas(
+      "Qual o valor inicial da variável " + variavel + "? Diga um número."
+    );
+    if (!inicioRaw) { feedbackAudio("Valor inicial não informado. Ação cancelada."); return null; }
+    const inicio = await textoParaNumero(inicioRaw) ?? inicioRaw;
+
+    const fimRaw = await ouvirComTentativas(
+      "Qual o valor final? O laço executará enquanto " + variavel + " for menor que esse valor."
+    );
+    if (!fimRaw) { feedbackAudio("Valor final não informado. Ação cancelada."); return null; }
+    const fim = await textoParaNumero(fimRaw) ?? fimRaw;
+
+    const incrementoRaw = await ouvirComTentativas(
+      "Qual o incremento a cada repetição? Por exemplo: um."
+    );
+    if (!incrementoRaw) { feedbackAudio("Incremento não informado. Ação cancelada."); return null; }
+    const incremento = await textoParaNumero(incrementoRaw) ?? incrementoRaw;
+
+    const acoes = await coletarAcoes("para");
+
+    feedbackAudio("O código foi criado com sucesso.");
+    return enviarParaServidor({ acao: "laco", tipo: "para", variavel, inicio, fim, incremento, acoes });
+
+  // --- FAZER-ENQUANTO ---
+  } else if (tipo.includes("fazer")) {
+    const acoes = await coletarAcoes("fazer-enquanto");
+
+    const condicao = await ouvirComTentativas(
+      "Qual a condição de continuação do laço? O bloco será repetido enquanto essa condição for verdadeira."
+    );
+    if (!condicao) { feedbackAudio("Condição não informada. Ação cancelada."); return null; }
+
+    feedbackAudio("O código foi criado com sucesso.");
+    return enviarParaServidor({ acao: "laco", tipo: "fazer-enquanto", condicao, acoes });
+
+  } else {
+    feedbackAudio(
+      "Tipo de laço não reconhecido. Por favor, tente novamente dizendo ENQUANTO, PARA ou FAZER ENQUANTO."
+    );
+    return null;
+  }
+}
+
 // Exemplo no seu JavaScript
 async function enviarParaServidor(json_data) {
   if (!json_data) {
