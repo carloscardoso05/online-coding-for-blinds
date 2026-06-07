@@ -875,6 +875,88 @@ async function criarFuncao() {
   return enviarParaServidor({ acao: "funcao", nome, parametros, acoes, retorna });
 }
 
+// =====================================================
+// CLASSE - criação de classe com métodos e herança opcional
+// =====================================================
+async function criarClasse() {
+  const nome = await ouvirComTentativas(
+    "Bem-vindo ao assistente para criação de classes. " +
+    "Qual o nome da classe que você deseja criar?"
+  );
+  if (!nome) { feedbackAudio("Nome não informado. Ação cancelada."); return null; }
+
+  // Herança
+  let herda = null;
+  const herdaRaw = await ouvirComTentativas(
+    "A classe " + nome + " herda de outra classe? Diga sim ou não."
+  );
+  if (herdaRaw) {
+    const herdaResp = corrigir(herdaRaw);
+    if (herdaResp.includes("sim") || herdaResp.includes("ok")) {
+      const classPai = await ouvirComTentativas(
+        "Qual o nome da classe pai que " + nome + " irá herdar?"
+      );
+      if (classPai) herda = classPai;
+    }
+  }
+
+  // Coleta de métodos
+  const metodos = [];
+
+  let coletandoMetodos = true;
+  while (coletandoMetodos) {
+    const nomeMetodo = await ouvirComTentativas(
+      metodos.length === 0
+        ? "Agora vamos adicionar os métodos da classe. Qual o nome do primeiro método?"
+        : "Qual o nome do próximo método?"
+    );
+    if (!nomeMetodo) {
+      if (metodos.length === 0) {
+        feedbackAudio("Nenhum método informado. Ação cancelada.");
+        return null;
+      }
+      break;
+    }
+
+    // Parâmetros do método
+    const paramsMetodo = [];
+    const temParamsRaw = await ouvirComTentativas(
+      "O método " + nomeMetodo + " recebe parâmetros? Diga sim ou não."
+    );
+    if (temParamsRaw) {
+      const temParams = corrigir(temParamsRaw);
+      if (temParams.includes("sim") || temParams.includes("ok")) {
+        const qtdRaw = await ouvirComTentativas(
+          "Quantos parâmetros o método terá? Diga um número."
+        );
+        if (qtdRaw) {
+          const qtd = await textoParaNumero(qtdRaw) ?? 1;
+          for (let i = 0; i < qtd; i++) {
+            const param = await ouvirComTentativas(`Diga o nome do ${i + 1}º parâmetro.`);
+            if (param) paramsMetodo.push(param);
+          }
+        }
+      }
+    }
+
+    // Ações do método
+    const acoesMetodo = await coletarAcoes("método " + nomeMetodo);
+
+    metodos.push({ nome: nomeMetodo, parametros: paramsMetodo, acoes: acoesMetodo });
+
+    // Perguntar se adiciona mais métodos
+    const maisRaw = await ouvirComTentativas(
+      "Deseja adicionar mais um método à classe " + nome + "? Diga sim ou não."
+    );
+    if (!maisRaw) break;
+    const mais = corrigir(maisRaw);
+    if (!mais.includes("sim") && !mais.includes("ok")) coletandoMetodos = false;
+  }
+
+  feedbackAudio("O código foi criado com sucesso.");
+  return enviarParaServidor({ acao: "classe", nome, herda, metodos });
+}
+
 // Exemplo no seu JavaScript
 async function enviarParaServidor(json_data) {
   if (!json_data) {
