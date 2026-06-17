@@ -1,0 +1,10 @@
+[lint]
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E501",  # line too long — not enforced in this codebase
+]
+
+[lint.per-file-ignores]
+"servers/**/*.py" = [
+    "F401",  # unused imports — some services import conditionally
+]

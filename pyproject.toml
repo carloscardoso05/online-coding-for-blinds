@@ -1,0 +1,33 @@
+[project]
+name = "online-coding-for-blinds"
+version = "0.1.0"
+description = "Égua Assist — voice-based programming assistant for visually impaired students"
+requires-python = ">=3.9"
+dependencies = [
+    "flask",
+    "flask-cors",
+    "google-generativeai",
+    "openai",
+    "python-dotenv",
+    "deep-translator",
+    "fastapi",
+    "uvicorn[standard]",
+    "numpy",
+]
+
+[project.optional-dependencies]
+# Heavy local-model deps — install only when using Llama/Phi/Qwen2/Whisper/Transformer services
+local-models = [
+    "gpt4all",
+    "sentence-transformers",
+    "faiss-cpu",
+    "torch",
+    "torchtext",
+    "spacy",
+    "openai-whisper",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+]
