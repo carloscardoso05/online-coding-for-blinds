@@ -1,15 +1,16 @@
 # rag_gemini_assistente_codigo.py
 # Requisitos: pip install google-generativeai faiss-cpu numpy flask flask-cors
 
-import os
 import json
+import os
+
 import faiss
-import numpy as np
 import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
-from flask import Flask, request, Response
-from flask_cors import CORS
+import numpy as np
 from dotenv import load_dotenv
+from flask import Flask, Response, request
+from flask_cors import CORS
+from google.generativeai.types import HarmBlockThreshold, HarmCategory
 
 # Carrega as variáveis do arquivo .env que está na raiz do projeto
 load_dotenv()
@@ -159,7 +160,7 @@ def gerar_codigo_com_rag(prompt_usuario: str, codigo_atual: str, k: int = 5) -> 
     exemplos_text = "\n".join([f"Prompt: {item['prompt']}\nCódigo: {item['codigo']}" for item in documentos_relevantes if item['tipo'] == 'jsonl'])
     if exemplos_text:
         prompt_final += f"Exemplos Similares:\n{exemplos_text}\n\n"
-        
+
     prompt_final += (
         "--- SITUAÇÃO ATUAL DO USUÁRIO ---\n"
         f"Código no editor:\n```egu\n{codigo_atual}\n```\n\n"
@@ -193,18 +194,18 @@ def gerar_codigo_endpoint():
         data = request.get_json()
         if not data:
             return Response("Erro: Requisição sem corpo JSON.", status=400, mimetype='text/plain')
-            
+
         prompt = data.get("prompt")
         codigo_atual = data.get("codigo_atual", "") # Default para string vazia se não for fornecido
 
         if not prompt:
             return Response("Erro: A chave 'prompt' é obrigatória no JSON.", status=400, mimetype='text/plain')
-            
+
         print(f"Prompt recebido: '{prompt}'")
         print(f"Código atual no editor:\n---\n{codigo_atual}\n---")
-        
+
         codigo_gerado = gerar_codigo_com_rag(prompt, codigo_atual, k=5)
-        
+
         return Response(response=codigo_gerado, status=200, mimetype='text/plain')
 
     except Exception as e:

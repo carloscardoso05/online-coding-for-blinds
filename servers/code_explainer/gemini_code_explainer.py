@@ -1,14 +1,15 @@
 # rag_gemini_feedback_docs.py
 # Requisitos: pip install google-generativeai faiss-cpu numpy flask flask-cors
 
-import os
 import json
+import os
+
 import faiss
-import numpy as np
 import google.generativeai as genai
-from flask import Flask, request, Response
-from flask_cors import CORS
+import numpy as np
 from dotenv import load_dotenv
+from flask import Flask, Response, request
+from flask_cors import CORS
 
 # Carrega as variáveis do arquivo .env que está na raiz do projeto
 load_dotenv()

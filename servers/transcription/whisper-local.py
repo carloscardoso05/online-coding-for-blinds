@@ -1,8 +1,9 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi.middleware.cors import CORSMiddleware
-import whisper
-import uvicorn
 import tempfile
+
+import uvicorn
+import whisper
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 

@@ -1,14 +1,15 @@
 # rag_openai_assistente_codigo.py
 # Requisitos: pip install openai faiss-cpu numpy flask flask-cors
 
-import os
 import json
+import os
+
 import faiss
 import numpy as np
-from openai import OpenAI
-from flask import Flask, request, Response
-from flask_cors import CORS
 from dotenv import load_dotenv
+from flask import Flask, Response, request
+from flask_cors import CORS
+from openai import OpenAI
 
 # Carrega as variáveis do arquivo .env que está na raiz do projeto
 load_dotenv()
@@ -134,7 +135,7 @@ def gerar_codigo_com_rag_openai(prompt_usuario: str, codigo_atual: str, k: int =
         "6.  **Entradas inválidas:** Se a solicitação do usuário não fizer o menor sentido (no caso de geração de código), NÃO RETORNE NADA. Use esta condição para prevenção de erros.\n"
         "--- INFORMAÇÕES DE REFERÊNCIA RECUPERADAS ---\n"
     )
-    
+
     contexto_recuperado = "--- INFORMAÇÕES DE REFERÊNCIA ---\n"
     docs_text = "\n".join([item['texto'] for item in documentos_relevantes if item['tipo'] == 'doc'])
     if docs_text:
@@ -179,12 +180,12 @@ def gerar_codigo_endpoint():
 
         if not prompt:
             return Response("Erro: 'prompt' é obrigatório.", status=400)
-            
+
         print(f"Prompt recebido: '{prompt}'")
         print(f"Código atual:\n---\n{codigo_atual}\n---")
-        
+
         codigo_gerado = gerar_codigo_com_rag_openai(prompt, codigo_atual, k=5)
-        
+
         return Response(response=codigo_gerado, status=200, mimetype='text/plain')
 
     except Exception as e:

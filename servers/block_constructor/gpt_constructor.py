@@ -1,14 +1,15 @@
 # servidor_egua_gpt_rag.py
 # Requisitos: pip install openai flask flask-cors faiss-cpu numpy
 
-import os
 import json
+import os
+
 import faiss
 import numpy as np
-from openai import OpenAI
-from flask import Flask, request, Response
-from flask_cors import CORS
 from dotenv import load_dotenv
+from flask import Flask, Response, request
+from flask_cors import CORS
+from openai import OpenAI
 
 # Carrega as variáveis do arquivo .env que está na raiz do projeto
 load_dotenv()
@@ -123,13 +124,13 @@ def gerar_codigo_hibrido_com_gpt(json_data: dict, k: int = 5) -> str:
     # 1. ETAPA DE RECUPERAÇÃO (RAG)
     texto_busca = json.dumps(json_data)
     emb_user = gerar_embedding(texto_busca)
-    
+
     contexto_rag = "### CONTEXTO E EXEMPLOS RELEVANTES RECUPERADOS ###\n"
     if index.ntotal > 0:
         k_valido = min(k, index.ntotal)
         _, I = index.search(np.array([emb_user]), k=k_valido)
         similares = [metadados[i] for i in I[0]]
-        
+
         for item in similares:
             if item["tipo"] == "jsonl":
                 contexto_rag += f"\n# Exemplo Similar:\n# JSON de Entrada: {json.dumps(item.get('json_input'))}\n# Código Égua de Saída:\n{item.get('codigo_gerado')}\n"
@@ -171,9 +172,9 @@ def gerar_codigo_endpoint():
             return Response("Erro: A chave 'acao' é obrigatória no JSON.", status=400)
 
         codigo_gerado = gerar_codigo_hibrido_com_gpt(json_data)
-        
+
         return Response(response=codigo_gerado, status=200, mimetype='text/plain')
-    
+
     except Exception as e:
         print(f"Erro crítico no endpoint: {e}")
         return Response("Erro interno no servidor.", status=500)

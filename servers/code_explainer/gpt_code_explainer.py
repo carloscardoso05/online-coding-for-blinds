@@ -1,11 +1,12 @@
-import os
 import json
+import os
+
 import faiss
 import numpy as np
-from openai import OpenAI
-from flask import Flask, request, Response
-from flask_cors import CORS
 from dotenv import load_dotenv
+from flask import Flask, Response, request
+from flask_cors import CORS
+from openai import OpenAI
 
 # Carrega as variáveis do arquivo .env que está na raiz do projeto
 load_dotenv()
@@ -196,7 +197,7 @@ def receber_execucao():
     data = request.get_json()
     if not data:
         return Response("Erro: Nenhum dado JSON recebido.", status=400, mimetype="text/plain")
-        
+
     codigo_usuario = data.get("codigo", "")
     tokens_usuario = data.get("tokens", "")
     ast_usuario = data.get("ast", "")

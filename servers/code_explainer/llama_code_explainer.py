@@ -2,14 +2,15 @@
 # Requisitos:
 #   pip install gpt4all faiss-cpu numpy flask flask-cors sentence-transformers
 
-import os
 import json
+import os
+
 import faiss
 import numpy as np
+from flask import Flask, Response, request
+from flask_cors import CORS
 from gpt4all import GPT4All
 from sentence_transformers import SentenceTransformer
-from flask import Flask, request, Response
-from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
@@ -168,7 +169,7 @@ def gerar_feedback_egua_local(
             )
         elif item["tipo"] == "doc":
             contexto += f"\n### Documentação Relevante ###\n{item['texto']}\n---\n"
-    
+
     contexto += (
         "\n--- DADOS DO USUÁRIO ---\n"
         f"Código do usuário:\n{codigo_usuario}\n"

@@ -2,14 +2,15 @@
 # Requisitos:
 #   pip install gpt4all faiss-cpu numpy flask flask-cors sentence-transformers
 
-import os
 import json
+import os
+
 import faiss
 import numpy as np
+from flask import Flask, Response, request
+from flask_cors import CORS
 from gpt4all import GPT4All
 from sentence_transformers import SentenceTransformer
-from flask import Flask, request, Response
-from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
@@ -36,7 +37,7 @@ print(f"Modelo de embeddings carregado (dimensão {EMB_DIM}).")
 
 # --- Configurações RAG ---
 # ATENÇÃO: Mudando o diretório do índice para não misturar com o anterior
-INDEX_DIR = "../../faiss_indexes/llama_generator" 
+INDEX_DIR = "../../faiss_indexes/llama_generator"
 # ATENÇÃO: Apontando para o novo arquivo JSONL com exemplos de prompt -> código
 JSONL_PATH = "../../rag/RAG_exemplos_codigo.jsonl"
 DOCS_PATH = "../../rag/docs.txt"
@@ -150,7 +151,7 @@ def gerar_codigo_egua_local(
             contexto += f"\n### Exemplo Similar ###\nPrompt: {item.get('prompt','')}\nCódigo: {item.get('codigo','')}\n---\n"
         elif item["tipo"] == "doc":
             contexto += f"\n### Documentação Relevante ###\n{item['texto']}\n---\n"
-    
+
     contexto += (
         "\n--- SITUAÇÃO ATUAL DO USUÁRIO ---\n"
         f"Código no editor:\n```egu\n{codigo_atual}\n```\n\n"
