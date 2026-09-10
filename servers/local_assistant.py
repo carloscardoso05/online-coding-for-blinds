@@ -11,10 +11,10 @@ import tempfile
 import faiss
 import numpy as np
 import uvicorn
-import whisper
 from fastapi import Body, FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
+from faster_whisper import WhisperModel
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 
@@ -44,7 +44,7 @@ EMB_DIM = embedder.get_sentence_embedding_dimension()
 print(f"Modelo de embeddings carregado (dimensão {EMB_DIM}).")
 
 print(f"Carregando modelo Whisper ({WHISPER_MODEL})...")
-whisper_model = whisper.load_model(WHISPER_MODEL)
+whisper_model = WhisperModel(WHISPER_MODEL, device="auto", compute_type="auto")
 print("Modelo Whisper carregado.")
 
 
@@ -206,8 +206,9 @@ async def transcrever(audio: UploadFile = File(...)):
         tmp.write(await audio.read())
         tmp_path = tmp.name
     try:
-        resultado = whisper_model.transcribe(tmp_path, language="pt")
-        return JSONResponse({"transcricao": resultado["text"]})
+        segmentos, _ = whisper_model.transcribe(tmp_path, language="pt")
+        transcricao = " ".join(segmento.text.strip() for segmento in segmentos).strip()
+        return JSONResponse({"transcricao": transcricao})
     finally:
         try:
             os.remove(tmp_path)

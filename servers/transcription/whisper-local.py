@@ -1,9 +1,9 @@
 import tempfile
 
 import uvicorn
-import whisper
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from faster_whisper import WhisperModel
 
 app = FastAPI()
 
@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 # Carrega modelo Whisper uma vez
-model = whisper.load_model("turbo")
+model = WhisperModel("turbo", device="auto", compute_type="auto")
 
 @app.post("/transcrever")
 async def transcrever(audio: UploadFile = File(...)):
@@ -27,8 +27,9 @@ async def transcrever(audio: UploadFile = File(...)):
         tmp_path = tmp.name
 
     # Transcreve
-    result = model.transcribe(tmp_path, language="pt")
-    return {"transcricao": result["text"]}
+    segmentos, _ = model.transcribe(tmp_path, language="pt")
+    transcricao = " ".join(segmento.text.strip() for segmento in segmentos).strip()
+    return {"transcricao": transcricao}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=3000)

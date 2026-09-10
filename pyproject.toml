@@ -25,7 +25,7 @@ local-models = [
     "torch",
     "torchtext",
     "spacy",
-    "openai-whisper",
+    "faster-whisper",
 ]
 
 [dependency-groups]
