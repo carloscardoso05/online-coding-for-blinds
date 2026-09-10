@@ -68,7 +68,6 @@ def corrigir_strings(tokens):
 
 def desfazer_tokenizacao(tokens):
     codigo = ""
-    espaco_necessario = False
 
     for i, (tipo, valor) in enumerate(tokens):
         token_anterior = tokens[i - 1] if i > 0 else None
@@ -233,7 +232,7 @@ def augment_tokenize_python_code(python_code_str, mask_factor=0.3):
 
     for i in range(0, len(python_tokens)):
       if python_tokens[i].type == 1 and python_tokens[i].string not in skip_list:
-        
+
         if i>0 and python_tokens[i-1].string in ['def', '.', 'import', 'raise', 'except', 'class']: # avoid masking modules, functions and error literals
           skip_list.append(python_tokens[i].string)
           tokenized_output.append((python_tokens[i].type, python_tokens[i].string))
@@ -246,10 +245,10 @@ def augment_tokenize_python_code(python_code_str, mask_factor=0.3):
         else:
           skip_list.append(python_tokens[i].string)
           tokenized_output.append((python_tokens[i].type, python_tokens[i].string))
-      
+
       else:
         tokenized_output.append((python_tokens[i].type, python_tokens[i].string))
-    
+
     return tokenized_output
 '''
 

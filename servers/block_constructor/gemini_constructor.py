@@ -59,12 +59,14 @@ def normalize(v: np.ndarray) -> np.ndarray:
     return v / norm if norm > 0 else v
 
 def carregar_jsonl(path: str) -> list[dict]:
-    if not os.path.exists(path): return []
+    if not os.path.exists(path):
+        return []
     with open(path, "r", encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
 
 def carregar_docs(path: str) -> list[str]:
-    if not os.path.exists(path): return []
+    if not os.path.exists(path):
+        return []
     with open(path, "r", encoding="utf-8") as f:
         return [p.strip() for p in f.read().split("\n\n") if p.strip()]
 
@@ -75,7 +77,8 @@ def construir_ou_carregar_indice():
     if os.path.exists(index_path) and os.path.exists(meta_path):
         print("Carregando índice RAG (Gemini) existente...")
         index = faiss.read_index(index_path)
-        with open(meta_path, "r", encoding="utf-8") as f: metadados = json.load(f)
+        with open(meta_path, "r", encoding="utf-8") as f:
+            metadados = json.load(f)
         return index, metadados
 
     print("Construindo novo índice RAG com embeddings do Gemini...")
@@ -101,7 +104,8 @@ def construir_ou_carregar_indice():
         metadados.append({"tipo": "doc", "texto": chunk})
 
     faiss.write_index(index, index_path)
-    with open(meta_path, "w", encoding="utf-8") as f: json.dump(metadados, f, ensure_ascii=False)
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(metadados, f, ensure_ascii=False)
     print(f"Índice RAG criado com {index.ntotal} vetores.")
     return index, metadados
 
@@ -135,8 +139,8 @@ def gerar_codigo_hibrido_com_gemini(json_data: dict, k: int = 5) -> str:
     contexto_rag = "### CONTEXTO E EXEMPLOS RELEVANTES RECUPERADOS ###\n"
     if index.ntotal > 0:
         k_valido = min(k, index.ntotal)
-        _, I = index.search(np.array([emb_user]), k=k_valido)
-        similares = [metadados[i] for i in I[0]]
+        _, indices = index.search(np.array([emb_user]), k=k_valido)
+        similares = [metadados[i] for i in indices[0]]
 
         for item in similares:
             if item["tipo"] == "jsonl":

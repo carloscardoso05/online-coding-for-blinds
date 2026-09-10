@@ -9,11 +9,13 @@ const transcriptionSelect = document.getElementById("transcriptionModel");
 const translationSelect = document.getElementById("translationModel");
 const assistantSelect = document.getElementById("assistantModel");
 const constructorSelect = document.getElementById("constructorModel");
+const ollamaSelect = document.getElementById("ollamaModel");
 
 const previewTranscription = document.getElementById("previewTranscription");
 const previewTranslation = document.getElementById("previewTranslation");
 const previewAssistant = document.getElementById("previewAssistant");
 const previewConstructor = document.getElementById("previewConstructor");
+const previewOllama = document.getElementById("previewOllama");
 
 // Função para atualizar previews de forma segura
 function updatePreviews() {
@@ -31,8 +33,42 @@ function updatePreviews() {
   }
 }
 
+// Carrega os modelos instalados no Ollama (servidor unificado em localhost:3000)
+async function carregarModelosOllama() {
+  try {
+    const response = await fetch("http://localhost:3000/modelos");
+    const data = await response.json();
+    const modelos = data.modelos || [];
+
+    ollamaSelect.innerHTML = "";
+    if (modelos.length === 0) {
+      ollamaSelect.innerHTML =
+        '<option value="">Nenhum modelo (rode: ollama pull llama3.2)</option>';
+      previewOllama.textContent = "Atualmente: nenhum modelo instalado";
+      return;
+    }
+
+    modelos.forEach(modelo => {
+      const option = document.createElement("option");
+      option.value = modelo;
+      option.textContent = modelo;
+      ollamaSelect.appendChild(option);
+    });
+
+    const salvo = localStorage.getItem("ollamaModel");
+    if (salvo && modelos.includes(salvo)) {
+      ollamaSelect.value = salvo;
+    }
+    previewOllama.textContent = `Atualmente: ${ollamaSelect.value}`;
+  } catch (error) {
+    ollamaSelect.innerHTML = '<option value="">Ollama offline (porta 3000)</option>';
+    previewOllama.textContent = "Atualmente: Ollama offline";
+  }
+}
+
 // Abrir modal com valores salvos e garantir selects válidos
 openBtn.addEventListener("click", () => {
+  carregarModelosOllama();
   transcriptionSelect.value = localStorage.getItem("transcriptionModel") || "whisper-local";
   if (transcriptionSelect.selectedIndex === -1) transcriptionSelect.selectedIndex = 0;
 
@@ -65,6 +101,7 @@ saveBtn.addEventListener("click", () => {
   localStorage.setItem("translationModel", translationSelect.value);
   localStorage.setItem("assistantModel", assistantSelect.value);
   localStorage.setItem("constructorModel", constructorSelect.value);
+  localStorage.setItem("ollamaModel", ollamaSelect.value);
 
   modal.classList.remove("show");
 

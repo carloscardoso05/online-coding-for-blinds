@@ -18,12 +18,12 @@ CORS(app)
 # Configuração dos Modelos
 # -------------------------
 # Modelo de Geração (LLM)
-MODEL_PATH = "/home/victor_santiago/Documentos/online-coding-for-blinds/models/Llama-3.2-1B-Instruct-Q4_0.gguf"
+MODEL_PATH = "models/Llama-3.2-1B-Instruct-Q4_0.gguf"
 if not os.path.exists(MODEL_PATH):
     raise FileNotFoundError(f"Arquivo do modelo LLM não encontrado em '{MODEL_PATH}'.")
 
 print("Carregando o modelo GPT4All (LLM)...")
-llm_model = GPT4All(MODEL_PATH)
+llm_model = GPT4All(os.path.basename(MODEL_PATH), model_path=os.path.dirname(MODEL_PATH))
 print("Modelo GPT4All carregado.")
 
 # Modelo de Embeddings (para RAG)
@@ -52,12 +52,14 @@ def gerar_embedding(texto: str) -> np.ndarray:
     return np.array(embedding, dtype=np.float32)
 
 def carregar_jsonl(path: str) -> list[dict]:
-    if not os.path.exists(path): return []
+    if not os.path.exists(path):
+        return []
     with open(path, "r", encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
 
 def carregar_docs(path: str) -> list[str]:
-    if not os.path.exists(path): return []
+    if not os.path.exists(path):
+        return []
     with open(path, "r", encoding="utf-8") as f:
         return [p.strip() for p in f.read().split("\n\n") if p.strip()]
 
@@ -68,7 +70,8 @@ def construir_ou_carregar_indice():
     if os.path.exists(index_path) and os.path.exists(meta_path):
         print("Carregando índice RAG existente...")
         index = faiss.read_index(index_path)
-        with open(meta_path, "r", encoding="utf-8") as f: metadados = json.load(f)
+        with open(meta_path, "r", encoding="utf-8") as f:
+            metadados = json.load(f)
         return index, metadados
 
     print("Construindo novo índice RAG...")
@@ -93,7 +96,8 @@ def construir_ou_carregar_indice():
         metadados.append({"tipo": "doc", "texto": chunk})
 
     faiss.write_index(index, index_path)
-    with open(meta_path, "w", encoding="utf-8") as f: json.dump(metadados, f, ensure_ascii=False)
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(metadados, f, ensure_ascii=False)
     print(f"Índice RAG criado com {index.ntotal} vetores.")
     return index, metadados
 
@@ -127,8 +131,8 @@ def gerar_codigo_hibrido_rag(json_data: dict, k: int = 3) -> str:
     contexto_rag = "### CONTEXTO E EXEMPLOS RELEVANTES (Recuperados para te ajudar) ###\n"
     if index.ntotal > 0:
         k_valido = min(k, index.ntotal)
-        _, I = index.search(np.array([emb_user]), k=k_valido)
-        similares = [metadados[i] for i in I[0]]
+        _, indices = index.search(np.array([emb_user]), k=k_valido)
+        similares = [metadados[i] for i in indices[0]]
 
         for item in similares:
             if item["tipo"] == "jsonl":

@@ -161,7 +161,8 @@ const assistantURLS = {
   "gpt-4o": "http://localhost:5100/",
   "phi-2": "http://localhost:5200/",
   "llama-3": "http://localhost:5300/",
-  "qwen2": "http://localhost:5400/"
+  "qwen2": "http://localhost:5400/",
+  "ollama": "http://localhost:3000/explicar"
 };
 
 async function sendDataToExplain(code, tokens, ast, output) { // <-- 1. Adicionados 'tokens' e 'ast'
@@ -175,6 +176,10 @@ async function sendDataToExplain(code, tokens, ast, output) { // <-- 1. Adiciona
     ast: ast,       // <-- 3. Chave 'ast' adicionada
     output: output
   };
+
+  if (selected_assistantModel === "ollama") {
+    payload.model = localStorage.getItem("ollamaModel") || "";
+  }
 
   // O restante da função permanece exatamente o mesmo
   const xhr = getXmlHttpRequestObjectExplain();

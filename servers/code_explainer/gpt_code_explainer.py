@@ -137,8 +137,8 @@ def gerar_feedback_egua(
     similares = []
     if index.ntotal > 0:
         k_valido = min(k, index.ntotal)
-        _, I = index.search(np.array([emb_user]), k=k_valido)
-        similares = [metadados[i] for i in I[0]]
+        _, indices = index.search(np.array([emb_user]), k=k_valido)
+        similares = [metadados[i] for i in indices[0]]
 
     contexto = (
         "Você é um assistente pedagógico para a linguagem de programação 'Égua'.\n"

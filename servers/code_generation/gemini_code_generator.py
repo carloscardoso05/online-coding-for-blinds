@@ -132,8 +132,8 @@ def gerar_codigo_com_rag(prompt_usuario: str, codigo_atual: str, k: int = 5) -> 
     documentos_relevantes = []
     if index.ntotal > 0:
         k_valido = min(k, index.ntotal)
-        _, I = index.search(np.array([emb_user]), k=k_valido)
-        documentos_relevantes = [metadados[i] for i in I[0]]
+        _, indices = index.search(np.array([emb_user]), k=k_valido)
+        documentos_relevantes = [metadados[i] for i in indices[0]]
     else:
         print("Aviso: O índice FAISS está vazio. Pulando a etapa de recuperação.")
 

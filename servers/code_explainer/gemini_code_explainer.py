@@ -132,8 +132,8 @@ def gerar_feedback(
     similares = []
     if index.ntotal > 0:
         k_valido = min(k, index.ntotal)
-        _, I = index.search(np.array([emb_user]), k=k_valido)
-        similares = [metadados[i] for i in I[0]]
+        _, indices = index.search(np.array([emb_user]), k=k_valido)
+        similares = [metadados[i] for i in indices[0]]
 
     # --- NOVO: garantir pelo menos 1 exemplo e 1 doc ---
     exemplo_extra = next((m for m in metadados if m["tipo"] == "jsonl"), None)

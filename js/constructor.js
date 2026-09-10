@@ -32,6 +32,7 @@ const constructorURLs = {
   "phi-2": "http://localhost:7200/gerar-codigo",
   "llama-3": "http://localhost:7300/gerar-codigo",
   "qwen2": "http://localhost:7400/gerar-codigo",
+  "ollama": "http://localhost:3000/construir",
 };
 
 // A biblioteca se anexa ao 'window' como 'window.wordsToNumbers'.
@@ -965,6 +966,10 @@ async function enviarParaServidor(json_data) {
   }
 
   const selected_model = getSelectedConstructor();
+
+  if (selected_model === "ollama") {
+    json_data.model = localStorage.getItem("ollamaModel") || "";
+  }
 
   const response = await fetch(constructorURLs[selected_model], {
     method: 'POST',

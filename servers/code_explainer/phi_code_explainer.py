@@ -16,7 +16,7 @@ app = Flask(__name__)
 CORS(app)
 
 # --- Configurações ---
-MODEL_PATH = "/home/victor_santiago/Documentos/online-coding-for-blinds/models/phi-2.Q4_K_M.gguf"
+MODEL_PATH = "models/phi-2.Q4_K_M.gguf"
 
 if not os.path.exists(MODEL_PATH):
     raise FileNotFoundError(
@@ -25,7 +25,7 @@ if not os.path.exists(MODEL_PATH):
     )
 
 print("Carregando o modelo GPT4All para geração (Phi-2)...")
-llm_model = GPT4All(MODEL_PATH)
+llm_model = GPT4All(os.path.basename(MODEL_PATH), model_path=os.path.dirname(MODEL_PATH))
 print("Modelo GPT4All carregado com sucesso.")
 
 # --- Embeddings com SentenceTransformers ---
@@ -144,8 +144,8 @@ def gerar_feedback_egua_local(
     similares = []
     if index.ntotal > 0:
         k_valido = min(k, index.ntotal)
-        _, I = index.search(np.array([emb_user]), k=k_valido)
-        similares = [metadados[i] for i in I[0]]
+        _, indices = index.search(np.array([emb_user]), k=k_valido)
+        similares = [metadados[i] for i in indices[0]]
 
     contexto = (
         "Você é um assistente pedagógico para a linguagem de programação 'Égua'.\n"

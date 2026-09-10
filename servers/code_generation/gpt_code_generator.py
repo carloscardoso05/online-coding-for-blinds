@@ -118,8 +118,8 @@ def gerar_codigo_com_rag_openai(prompt_usuario: str, codigo_atual: str, k: int =
         return "// Erro: o índice de busca está vazio."
 
     k_valido = min(k, index.ntotal)
-    _, I = index.search(np.array([emb_user]), k=k_valido)
-    documentos_relevantes = [metadados[i] for i in I[0]]
+    _, indices = index.search(np.array([emb_user]), k=k_valido)
+    documentos_relevantes = [metadados[i] for i in indices[0]]
 
     # 3. Montar o prompt para o modelo de chat
     system_prompt = (

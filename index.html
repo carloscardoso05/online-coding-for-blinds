@@ -529,6 +529,7 @@
           <option value="phi-2">Phi-2</option>
           <option value="llama-3">Llama 3.2 1B Instruct</option>
           <option value="qwen2">Qwen2-1.5B-Instruct</option>
+          <option value="ollama">Ollama (local)</option>
         </select>
         <small id="previewTranslation">Atualmente: gemini-1.5-flash-latest</small>
       </div>
@@ -541,6 +542,7 @@
           <option value="phi-2">Phi-2</option>
           <option value="llama-3">Llama 3.2 1B Instruct</option>
           <option value="qwen2">Qwen2-1.5B-Instruct</option>
+          <option value="ollama">Ollama (local)</option>
         </select>
         <small id="previewAssistant">Atualmente: gemini-2.0-flash-latest</small>
       </div>
@@ -553,8 +555,17 @@
           <option value="phi-2">Phi-2</option>
           <option value="llama-3">Llama 3.2 1B Instruct</option>
           <option value="qwen2">Qwen2-1.5B-Instruct</option>
+          <option value="ollama">Ollama (local)</option>
         </select>
         <small id="previewConstructor">Atualmente: gemini-1.5-flash-latest</small>
+      </div>
+
+      <div class="config-group">
+        <label for="ollamaModel">🦙 Modelo Ollama (local):</label>
+        <select id="ollamaModel">
+          <option value="">Carregando modelos...</option>
+        </select>
+        <small id="previewOllama">Atualmente: —</small>
       </div>
 
       <button id="saveConfig">Salvar</button>

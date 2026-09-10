@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const posicaoCursor = editorTextArea.selectionStart;
-    let tokenAlvo = null;
+    let tokenAlvo;
 
     if (direcao === 'proximo') {
       // Encontra o primeiro token que começa na posição do cursor ou depois dela.
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Prepara o texto para leitura. 
     // Se a linha for APENAS um símbolo (com ou sem espaços), forçamos a leitura dele.
-    let textoParaLer = linhaAlvoConteudo;
+    let textoParaLer;
     const conteudoLimpo = linhaAlvoConteudo.trim();
 
     // Dicionário simples para garantir leitura de símbolos isolados comuns
@@ -880,7 +880,8 @@ const modelURLs = {
   "transformer": "http://localhost:6969/",
   "phi-2": "http://localhost:4300/gerar-codigo",
   "llama-3": "http://localhost:4400/gerar-codigo",
-  "qwen2": "http://localhost:4500/gerar-codigo"
+  "qwen2": "http://localhost:4500/gerar-codigo",
+  "ollama": "http://localhost:3000/gerar-codigo"
 };
 
 async function sendData(userPrompt) {
@@ -900,6 +901,10 @@ async function sendData(userPrompt) {
     prompt: userPrompt,
     codigo_atual: code
   };
+
+  if (selected_model === "ollama") {
+    data.model = localStorage.getItem("ollamaModel") || "";
+  }
 
   const xhr = getXmlHttpRequestObject();
   xhr.onreadystatechange = () => sendDataCallback(xhr);
