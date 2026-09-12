@@ -132,6 +132,8 @@ Regras do plano:
 - Todo entregável é testado com teclado **e** leitor de tela.
 - Use o repositório como referência: compare o que você construir com o código
   da `master` e da `rewrite`.
+- Os nomes de repositório são sugestões; a stack é um ponto de partida, não uma
+  camisa de força.
 
 ### Semana 1 — Web + acessibilidade + voz no browser
 
@@ -143,6 +145,10 @@ acessibilidade desde o início.
 - **Projeto:** página acessível que grava áudio do microfone, transcreve com
   Web Speech API, exibe o texto numa `aria-live` e fala a resposta com
   `SpeechSynthesis`, com sliders de velocidade/tom.
+- **Repositório sugerido:** `voz-acessivel-web`
+- **Stack sugerida:** Vite + TypeScript (sem framework no começo); Web Speech
+  API, MediaRecorder e Web Audio API; testes de acessibilidade com Playwright +
+  axe-core; leitor de tela (NVDA) desde o primeiro commit.
 - **Pronto quando:** um usuário consegue operar tudo só com teclado e leitor de
   tela, com feedback falado em cada ação.
 - Referência no repo: `index.html` (handler do microfone) e `js/assist.js`
@@ -157,6 +163,10 @@ acessibilidade desde o início.
 - **Projeto:** endpoint `POST /chat` que chama o Ollama (`localhost:11434/v1`)
   e devolve a resposta em streaming via SSE; front mínimo que imprime os tokens
   conforme chegam.
+- **Repositório sugerido:** `ollama-chat-streaming`
+- **Stack sugerida:** Python 3.12 + `uv`; FastAPI + Pydantic v2; SSE com
+  `sse-starlette` ou `StreamingResponse`; SDK `openai` apontando para o Ollama;
+  front em TypeScript com `EventSource`; Docker Compose opcional.
 - **Pronto quando:** a resposta aparece incrementalmente no front e a falha do
   Ollama retorna erro JSON claro, não stack trace.
 - Referência no repo: `servers/local_assistant.py:181-200` (chamada Ollama
@@ -171,6 +181,10 @@ acessibilidade desde o início.
 - **Projeto:** tradutor de frases em português para JSON validado por schema
   (ex.: `{acao, tipo, nome, valor}`). Se o JSON não validar, exibir erro e não
   deixar passar. Monte 20 casos de teste com resultado esperado.
+- **Repositório sugerido:** `egua-structured-output`
+- **Stack sugerida:** Python + FastAPI; Pydantic para o schema; OpenAI SDK
+  (`response_format`/function calling) ou a lib `instructor`; Ollama como
+  provedor local; `pytest` para os 20 casos; `promptfoo` para comparar prompts.
 - **Pronto quando:** o conjunto de 20 casos passa com consistência e você
   consegue medir a taxa de acerto antes/depois de mudar o prompt.
 - Referência no repo: `SISTEMA_CONSTRUIR` e o fluxo do construtor por voz
@@ -185,6 +199,11 @@ acessibilidade desde o início.
 - **Projeto:** indexar `rag/RAG_exemplos_codigo.jsonl` + `rag/docs.txt` com um
   modelo de embedding **multilíngue**, buscar top-k e devolver os itens com
   score. Endpoint `/buscar`.
+- **Repositório sugerido:** `rag-do-zero`
+- **Stack sugerida:** Python + `uv`; `sentence-transformers` com
+  `intfloat/multilingual-e5-small` ou `paraphrase-multilingual-MiniLM-L12-v2`;
+  `faiss-cpu`; NumPy; FastAPI para o endpoint; scripts de indexação em
+  `scripts/`.
 - **Pronto quando:** dada uma pergunta em português sem palavras em comum com
   os exemplos, a busca recupera um exemplo relevante e você vê o score.
 - Referência no repo: `servers/local_assistant.py:51-147` (classe `IndiceRAG`).
@@ -198,6 +217,11 @@ acessibilidade desde o início.
 - **Projeto:** evoluir o `/buscar` da semana 4 com threshold, filtro por tipo e
   um mini-conjunto de avaliação (20 perguntas → item esperado) medindo
   recall@5; comparar com/sem reranking.
+- **Repositório sugerido:** `rag-qualidade`
+- **Stack sugerida:** reaproveitar a semana 4 + `rank-bm25` (busca híbrida);
+  cross-encoder da `sentence-transformers` para reranking; `pytrec_eval` ou
+  `ranx` para recall@k/MRR; opcional trocar FAISS por `qdrant-client` ou
+  `pgvector` (Postgres) para comparar.
 - **Pronto quando:** você tem números antes/depois e sabe justificar cada
   parâmetro do retrieval.
 - Referência no repo: os três índices `unified_*` e seus top-k fixos
@@ -211,6 +235,10 @@ acessibilidade desde o início.
 - **Projeto:** serviço que recebe código Égua, roda lexer/parser e devolve
   `{ok, tokens, ast, erro}`. Usar isso para validar a saída do gerador e tenho
   um mecanismo de reparo guiado pelo erro de parse.
+- **Repositório sugerido:** `egua-parser-service`
+- **Stack sugerida:** Node.js + TypeScript reaproveitando o parser de
+  `js/egua/egua.min.js` (ou portar para Python com `Lark`/`PLY`); API em
+  FastAPI ou Express; testes com `pytest` ou `Vitest`.
 - **Pronto quando:** código com erro de sintaxe retorna a linha e a mensagem, e
   o pipeline rejeita (ou corrige) o output inválido da LLM.
 - Referência no repo: `js/explain-code.js:83-114` (lexer/parser/`runBlock`) na
@@ -227,6 +255,11 @@ acessibilidade desde o início.
   `chat(sistema, usuario, params)` implementada por Ollama/OpenAI/Gemini +
   fake para testes; rotas `/gerar-codigo`, `/explicar`, `/construir` usando
   essa camada; testes que rodam sem rede.
+- **Repositório sugerido:** `llm-providers-gateway`
+- **Stack sugerida:** Python + FastAPI; `pydantic-settings` para config; SDKs
+  `openai` e `google-generativeai` + Ollama; `structlog` ou
+  `python-json-logger`; `httpx` + `respx` para mockar provedores;
+  OpenTelemetry; `ruff` + `pytest`; Docker Compose.
 - **Pronto quando:** trocar de provedor é mudar uma string no payload, os
   testes passam offline e cada request tem log com id, duração e tokens.
 - Referência no repo: `servers/providers/` e `servers/api/` da `rewrite`.
@@ -239,6 +272,11 @@ acessibilidade desde o início.
   (com RAG) → validação no parser → execução no browser → explicação falada.
   Front acessível (teclado + leitor de tela), backend com streaming de tokens e
   TTS em fila com cancelamento.
+- **Repositório sugerido:** `egua-assist-v2` (ou `egua-assist-mvp`)
+- **Stack sugerida:** backend FastAPI + camada de providers + RAG da semana 5 +
+  validação da semana 6; front em TypeScript com React/Svelte/Solid e
+  CodeMirror 6; SSE para tokens e TTS; `faster-whisper`/Web Speech para STT;
+  Playwright + axe-core para acessibilidade; GitHub Actions + Docker Compose.
 - **Pronto quando:** uma pessoa cega consegue criar, executar e ouvir a
   explicação de um programa simples sem tocar no mouse, e cada etapa tem
   log/métrica.
@@ -249,16 +287,16 @@ acessibilidade desde o início.
 
 ## Mapa rápido: projeto da semana → trilhas cobertas
 
-| Semana | Projeto | Trilhas |
-|---|---|---|
-| 1 | Voz acessível no browser | 1, 2, 3 |
-| 2 | FastAPI + streaming | 4 |
-| 3 | Structured output | 4, 5 |
-| 4 | RAG parte 1 | 6 |
-| 5 | RAG parte 2 (qualidade) | 5, 6 |
-| 6 | Validação Égua (parser) | 7 |
-| 7 | Providers + observabilidade | 4, 8 |
-| 8 | MVP integrado | 1–9 |
+| Semana | Projeto | Repositório sugerido | Trilhas |
+|---|---|---|---|
+| 1 | Voz acessível no browser | `voz-acessivel-web` | 1, 2, 3 |
+| 2 | FastAPI + streaming | `ollama-chat-streaming` | 4 |
+| 3 | Structured output | `egua-structured-output` | 4, 5 |
+| 4 | RAG parte 1 | `rag-do-zero` | 6 |
+| 5 | RAG parte 2 (qualidade) | `rag-qualidade` | 5, 6 |
+| 6 | Validação Égua (parser) | `egua-parser-service` | 7 |
+| 7 | Providers + observabilidade | `llm-providers-gateway` | 4, 8 |
+| 8 | MVP integrado | `egua-assist-v2` | 1–9 |
 
 ## Hábitos que fazem diferença
 
